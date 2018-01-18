@@ -1,4 +1,4 @@
-package com.taskboards.boards;
+package com.taskboards.boards.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,6 +15,7 @@ public class Board {
 
 	@Id
 	@GeneratedValue
+	@Setter
 	private Long id;
 
 	@Setter
@@ -36,5 +37,5 @@ public class Board {
 	public String toString() {
 		return String.format("Board[id=%d, name='%s', description='%s']", id,
 				name, description);
-	}
+	}	
 }

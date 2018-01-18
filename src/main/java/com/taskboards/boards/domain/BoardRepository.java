@@ -1,4 +1,4 @@
-package com.taskboards.boards;
+package com.taskboards.boards.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,7 +1,9 @@
-package com.taskboards.boards;
+package com.taskboards.boards.web.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.taskboards.boards.domain.Board;
+import com.taskboards.boards.domain.BoardRepository;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.ValueChangeMode;

@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: board-service
+  cloud:
+    config:
+      uri: http://task-boards-configuration.herokuapp.com/
+    
+    
