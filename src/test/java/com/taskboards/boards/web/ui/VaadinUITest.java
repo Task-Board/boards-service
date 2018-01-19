@@ -18,17 +18,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.taskboards.boards.BoardsApplication;
 import com.taskboards.boards.domain.Board;
 import com.taskboards.boards.domain.BoardRepository;
-import com.taskboards.boards.web.ui.BoardEditor;
-import com.taskboards.boards.web.ui.VaadinUI;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.boot.VaadinAutoConfiguration;
 import com.vaadin.ui.Button;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = VaadinUITest.Config.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(classes = {BoardsApplication.class, VaadinUITest.Config.class}, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class VaadinUITest {
 
 	@Autowired
