@@ -3,8 +3,8 @@ jdk:
   - oraclejdk8
 install:
     - mvn -N io.takari:maven:wrapper
-    - ./mvnw install -DrepoToken=echo COVERALLTOKEN -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+    - ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 
 after_success:
     - mvn -N io.takari:maven:wrapper
-    - ./mvnw clean test jacoco:report coveralls:report -DrepoToken=echo COVERALLTOKEN
+    - ./mvnw clean test jacoco:report coveralls:report -DrepoToken=$COVERALLS_REPO_TOKEN
