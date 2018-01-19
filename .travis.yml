@@ -3,4 +3,4 @@ jdk:
   - oraclejdk8
 install:
 - mvn -N io.takari:maven:wrapper
-- ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+- ./mvnw install -DrepoToken=echo $COVERALLTOKEN -DskipTests=true -Dmaven.javadoc.skip=true -B -V
