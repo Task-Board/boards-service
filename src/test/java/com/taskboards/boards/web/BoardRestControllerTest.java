@@ -1,14 +1,16 @@
 package com.taskboards.boards.web;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.nio.charset.Charset;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,31 +52,94 @@ public class BoardRestControllerTest {
 	}
 	
 	@Test
-	public void shouldReturnEmptyWhenThereIsNoBoard() throws Exception {
+	public void shouldReturnNotFoundWhenThereIsNoBoard() throws Exception {
 		mockMvc.perform(get("/boards"))
 				.andExpect(status().isNotFound()); //Should be not found?
 	}
 	
 	@Test
 	public void shouldReturnAllBoard() throws Exception {
-		Board board = repository.save(new Board("Test", "Test board"));
-		mockMvc.perform(get("/boards"))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(contentType))
-             	.andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[0].name", is(board.getName())))
-                .andExpect(jsonPath("$[0].description", is(board.getDescription())))
-                .andExpect(jsonPath("$[0].persisted", is(true)))
-                .andExpect(jsonPath("$[0].links", hasSize(1)))
-                .andExpect(jsonPath("$[0].links[0].rel", is("self")))
-                .andExpect(jsonPath("$[0].links[0].href", is("http://localhost/boards/" + board.getId())));
+		String endpoint = "/boards";
+		int firstPosition = 0;
+		Board firstBoard = new Board("Test", "Test board");
+		firstBoard = repository.save(firstBoard);
+		
+		assertSizeOfTheListReturned(endpoint, 1);
+		assertBoardDataAtCorrectPosition(endpoint, firstBoard, firstPosition);
+		
+		int secondPosition = 1;
+		Board secondBoard = new Board("Test 2", "Test board 2");
+		secondBoard = repository.save(secondBoard);		
+		
+		assertSizeOfTheListReturned(endpoint, 2);
+		assertBoardDataAtCorrectPosition(endpoint, firstBoard, firstPosition);
+		assertBoardDataAtCorrectPosition(endpoint, secondBoard, secondPosition);
 	}
-	//@GetMapping
-	//@GetMapping("/name={name}")
-	//@GetMapping("/{id}")
+	
+	@Test
+	public void shouldReturnNotFoundWhenThereIsNoBoardWithTheNameProvided() throws Exception {
+		mockMvc.perform(get("/boards/name=anyName"))
+				.andExpect(status().isNotFound()); //Should be not found?
+	}
+	
+	@Test
+	public void shouldReturnAllBoardsStartingWithTheNameProvided() throws Exception {
+		String endpoint = "/boards/name=";
+		Board testBoard = repository.save(new Board("Test", ""));
+		Board anotherTest = repository.save(new Board("tested board", ""));
+		Board anotherBoard = repository.save(new Board("another test", ""));	
+		
+		assertSizeOfTheListReturned(endpoint + "tESt", 2);
+		assertBoardDataAtCorrectPosition(endpoint + "tESt", testBoard, 0);
+		assertBoardDataAtCorrectPosition(endpoint + "tESt", anotherTest, 1);
+		
+		assertSizeOfTheListReturned(endpoint + "ANO", 1);
+		assertBoardDataAtCorrectPosition(endpoint + "ANO", anotherBoard, 0);
+	}
+	
+	@Test
+	public void shouldReturnNotFoundWhenThereIsNoBoardWithTheIdProvided() throws Exception {
+		mockMvc.perform(get("/boards/1"))
+				.andExpect(status().isNotFound()); //Should be not found?
+	}
+
+	@Ignore
+	@Test
+	public void shouldReturnTheBoardWithTheIdProvided() throws Exception {
+		String endpoint = "/boards/";
+		Board testBoard = repository.save(new Board("Test", ""));
+		Board anotherTest = repository.save(new Board("tested board", ""));
+		Board anotherBoard = repository.save(new Board("another test", ""));	
+		
+		assertSizeOfTheListReturned(endpoint + "1", 1);
+		assertSizeOfTheListReturned(endpoint + "2", 1);
+		assertSizeOfTheListReturned(endpoint + "3", 1);
+		
+		assertBoardDataAtCorrectPosition(endpoint + "1", testBoard, 0);
+		assertBoardDataAtCorrectPosition(endpoint + "2", anotherTest, 0);		
+		assertBoardDataAtCorrectPosition(endpoint + "3", anotherBoard, 0);
+	}
+	
 	//@PostMapping
 	//@PutMapping("/{id}")
 	//@DeleteMapping("/{id}")
+
+	private void assertSizeOfTheListReturned(String endpoint, int expectedListSize) throws Exception {
+		mockMvc.perform(get(endpoint))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(contentType))
+     	.andExpect(jsonPath("$", hasSize(expectedListSize)));
+	}
+
+	private void assertBoardDataAtCorrectPosition(String endpoint, Board firstBoard, int firstPosition) throws Exception {
+		mockMvc.perform(get(endpoint))
+                .andExpect(jsonPath("$[" + firstPosition + "].id", is(firstBoard.getId().intValue())))
+                .andExpect(jsonPath("$[" + firstPosition + "].name", is(firstBoard.getName())))
+                .andExpect(jsonPath("$[" + firstPosition + "].description", is(firstBoard.getDescription())))
+                .andExpect(jsonPath("$[" + firstPosition + "].persisted", is(true)))
+                .andExpect(jsonPath("$[" + firstPosition + "].links", hasSize(1)))
+                .andExpect(jsonPath("$[" + firstPosition + "].links[0].rel", is("self")))
+                .andExpect(jsonPath("$[" + firstPosition + "].links[0].href", is("http://localhost/boards/" + firstBoard.getId())));
+	}
 
 }

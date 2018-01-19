@@ -1,5 +1,9 @@
 package com.taskboards.boards.web.ui;
 
+import static org.junit.Assert.assertFalse;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Matchers.argThat;
+
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
@@ -11,9 +15,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.taskboards.boards.domain.Board;
 import com.taskboards.boards.domain.BoardRepository;
 import com.vaadin.ui.Button;
-
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.argThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BoardEditorTest {
@@ -44,6 +45,13 @@ public class BoardEditorTest {
 		getDeleteButton().click();
 
 		then(this.customerRepository).should().delete(argThat(customerMatchesEditorFields()));
+	}
+	
+	@Test
+	public void shouldHideEditorWhenNoBoardIsBeingEdited() {
+		this.editor.editBoard(null);
+
+		assertFalse(this.editor.isVisible());
 	}
 
 	private Button getSaveButton() {
