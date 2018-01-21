@@ -27,7 +27,7 @@ import com.vaadin.spring.boot.VaadinAutoConfiguration;
 import com.vaadin.ui.Button;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {BoardsApplication.class, VaadinUITest.Config.class}, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(classes = {BoardsApplication.class, VaadinUITest.Config.class}, properties = "spring.cloud.config.enabled=false", webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class VaadinUITest {
 
 	@Autowired
@@ -62,7 +62,6 @@ public class VaadinUITest {
 
 		then(getBoardsInGrid()).hasSize(6);
 		then(getBoardsInGrid().get(5)).extracting("name", "description").containsExactly("Test board name", "A test board");
-
 	}
 
 	@Test
@@ -124,6 +123,7 @@ public class VaadinUITest {
 
 		@PostConstruct
 		public void initializeData() {
+			this.repository.deleteAll();
 			this.repository.save(new Board("First board", "First test board"));
 			this.repository.save(new Board("Second board", ""));
 			this.repository.save(new Board("Another board", "Not empty descrition"));

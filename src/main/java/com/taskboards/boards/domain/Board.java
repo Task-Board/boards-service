@@ -33,7 +33,7 @@ public class Board {
 	
 	@Override
 	public String toString() {
-		return String.format("Board[id=%d, name='%s', description='%s']", id,
+		return String.format("Board[id=%s, name='%s', description='%s']", id,
 				name, description);
 	}	
 }
