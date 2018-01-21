@@ -77,7 +77,8 @@ public class VaadinUI extends UI {
 	}
 
 	private void configureLayout() {
-		grid.setHeight(300, Unit.PIXELS);
+		this.grid.setWidth(70, Unit.PERCENTAGE);
+		grid.setHeight(60, Unit.PERCENTAGE);
 		grid.setColumns("id", "name", "description");
 		filter.setPlaceholder("Filter by name");
 	}
