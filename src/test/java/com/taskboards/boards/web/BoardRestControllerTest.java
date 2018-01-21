@@ -78,7 +78,7 @@ public class BoardRestControllerTest {
 	@Before
 	public void setUp() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
-		this.repository.deleteAllInBatch();
+		this.repository.deleteAll();
 	}
 
 	@Test
@@ -95,7 +95,7 @@ public class BoardRestControllerTest {
 		ResultActions result = performGetOn(BOARDS_ROOT_ENDPOINT);
 
 		assertNumberOfBoardsReturned(result, 1);
-		assertBoardIsPresentAndWithCorrectData(result, hrmTeam);
+		assertBoardIsPresentWithCorrectData(result, hrmTeam);
 	}
 
 	@Test
@@ -107,9 +107,9 @@ public class BoardRestControllerTest {
 		ResultActions result = performGetOn(BOARDS_ROOT_ENDPOINT);
 
 		assertNumberOfBoardsReturned(result, 3);
-		assertBoardIsPresentAndWithCorrectData(result, hrmTeam);
-		assertBoardIsPresentAndWithCorrectData(result, teamTIE);
-		assertBoardIsPresentAndWithCorrectData(result, vaderFist);
+		assertBoardIsPresentWithCorrectData(result, hrmTeam);
+		assertBoardIsPresentWithCorrectData(result, teamTIE);
+		assertBoardIsPresentWithCorrectData(result, vaderFist);
 	}
 
 	@Test
@@ -129,7 +129,7 @@ public class BoardRestControllerTest {
 		ResultActions result = performGetOnWithParameter(ALL_BOARDS_BY_NAME_FILTER_ENDPOINT, "team");
 
 		assertNumberOfBoardsReturned(result, 1);
-		assertBoardIsPresentAndWithCorrectData(result, hrmTeam);
+		assertBoardIsPresentWithCorrectData(result, hrmTeam);
 	}
 
 	@Test
@@ -141,8 +141,8 @@ public class BoardRestControllerTest {
 		ResultActions result = performGetOnWithParameter(ALL_BOARDS_BY_NAME_FILTER_ENDPOINT, "TEAM");
 
 		assertNumberOfBoardsReturned(result, 2);
-		assertBoardIsPresentAndWithCorrectData(result, hrmTeam);
-		assertBoardIsPresentAndWithCorrectData(result, teamTIE);
+		assertBoardIsPresentWithCorrectData(result, hrmTeam);
+		assertBoardIsPresentWithCorrectData(result, teamTIE);
 	}
 
 	@Test
@@ -205,7 +205,7 @@ public class BoardRestControllerTest {
 	
 	@Test
 	public void should_return_UnprocessableEntity_when_the_edition_removes_the_board_name() throws Exception {
-		Long hrmTeamBoardID = repository.save(new Board("HRM Team", "Hypermatter Reactor Maintenance Team board")).getId();		
+		String hrmTeamBoardID = repository.save(new Board("HRM Team", "Hypermatter Reactor Maintenance Team board")).getId();		
 		Board editedTeamHRM = new Board("", "Hypermatter Reactor Maintenance Team TODO board");
 
 		ResultActions result = performPutOnWithParameterAndBoard(BOARD_BY_ID_ENDPOINT, hrmTeamBoardID.toString(), editedTeamHRM);
@@ -215,7 +215,7 @@ public class BoardRestControllerTest {
 
 	@Test
 	public void should_return_the_edited_board() throws Exception {
-		Long hrmTeamBoardID = repository.save(new Board("HRM Team", "Hypermatter Reactor Maintenance Team board")).getId();		
+		String hrmTeamBoardID = repository.save(new Board("HRM Team", "Hypermatter Reactor Maintenance Team board")).getId();		
 		Board editedTeamHRM = new Board("Team HRM TODO", "Hypermatter Reactor Maintenance Team TODO board");
 
 		ResultActions result = performPutOnWithParameterAndBoard(BOARD_BY_ID_ENDPOINT, hrmTeamBoardID.toString(), editedTeamHRM);
@@ -226,7 +226,7 @@ public class BoardRestControllerTest {
 	
 	@Test
 	public void should_persist_the_editions_on_board() throws Exception {
-		Long hrmTeamBoardID = repository.save(new Board("HRM Team", "Hypermatter Reactor Maintenance Team board")).getId();		
+		String hrmTeamBoardID = repository.save(new Board("HRM Team", "Hypermatter Reactor Maintenance Team board")).getId();		
 		Board editedTeamHRM = new Board("Team HRM TODO", "Hypermatter Reactor Maintenance Team TODO board");
 
 		performPutOnWithParameterAndBoard(BOARD_BY_ID_ENDPOINT, hrmTeamBoardID.toString(), editedTeamHRM);
@@ -253,7 +253,7 @@ public class BoardRestControllerTest {
 	}
 	
 	@Test
-	public void should_return_deleted_boards_in_futures_requets() throws Exception {
+	public void should_not_return_deleted_boards_in_futures_requets() throws Exception {
 		Board hrmTeam = repository.save(new Board("Team HRM", "Hypermatter Reactor Maintenance Team board"));
 		Board teamTIE = repository.save(new Board("Team TIE Wash and Wax Kanban", "Use is mandatory, Vader's orders."));
 		Board vaderFist = repository.save(new Board("501st Legion TODO", "Vader's Fist TODO. *Should not be updated during battle!"));
@@ -262,8 +262,8 @@ public class BoardRestControllerTest {
 		
 		ResultActions result = performGetOn(BOARDS_ROOT_ENDPOINT);
 		assertNumberOfBoardsReturned(result, 2);
-		assertBoardIsPresentAndWithCorrectData(result, hrmTeam);
-		assertBoardIsPresentAndWithCorrectData(result, teamTIE);
+		assertBoardIsPresentWithCorrectData(result, hrmTeam);
+		assertBoardIsPresentWithCorrectData(result, teamTIE);
 		
 		result = performGetOnWithParameter(BOARD_BY_ID_ENDPOINT, vaderFist.getId().toString());
 		result.andExpect(status().isNotFound());
@@ -278,11 +278,11 @@ public class BoardRestControllerTest {
 	}
 	
 	private ResultActions performPostOnWithBoard(String boardsRootEndpoint, Board parameter) throws Exception {
-		return mockMvc.perform(post(boardsRootEndpoint).contentType(contentType).content(json(parameter)));
+		return mockMvc.perform(post(boardsRootEndpoint).contentType(contentType).content(toJson(parameter)));
 	}
 	
 	private ResultActions performPutOnWithParameterAndBoard(String boardsRootEndpoint, String parameter, Board board) throws Exception {
-		return mockMvc.perform(put(boardsRootEndpoint, parameter).contentType(contentType).content(json(board)));
+		return mockMvc.perform(put(boardsRootEndpoint, parameter).contentType(contentType).content(toJson(board)));
 	}
 
 	private void assertNumberOfBoardsReturned(ResultActions perform, int expectedListSize) throws Exception {
@@ -293,9 +293,9 @@ public class BoardRestControllerTest {
 		return mockMvc.perform(delete(endpoint, parameter));
 	}
 
-	private void assertBoardIsPresentAndWithCorrectData(ResultActions perform, Board board) throws Exception {
+	private void assertBoardIsPresentWithCorrectData(ResultActions perform, Board board) throws Exception {
 		int index = getBoardIndex(perform, board);
-		perform.andDo(print()).andExpect(jsonPath("$[" + index + "].id", is(board.getId().intValue())))
+		perform.andDo(print()).andExpect(jsonPath("$[" + index + "].id", is(board.getId())))
 				.andExpect(jsonPath("$[" + index + "].name", is(board.getName())))
 				.andExpect(jsonPath("$[" + index + "].description", is(board.getDescription())))
 				.andExpect(jsonPath("$[" + index + "].persisted", is(true)))
@@ -311,23 +311,22 @@ public class BoardRestControllerTest {
 				.andExpect(jsonPath("_links.self.href", is("http://localhost/boards/" + board.getId())));
 	}
 
-	private long getIdReturned(ResultActions result) throws UnsupportedEncodingException {
-		Integer id = JsonPath.read(result.andReturn().getResponse().getContentAsString(), "$.id");
-		return id.longValue();
+	private String getIdReturned(ResultActions result) throws UnsupportedEncodingException {
+		return JsonPath.read(result.andReturn().getResponse().getContentAsString(), "$.id");
 	}
 	
 	private int getBoardIndex(ResultActions perform, Board board) throws UnsupportedEncodingException {
-		List<Integer> ids = JsonPath.read(perform.andReturn().getResponse().getContentAsString(), "$.[*].id");
+		List<String> ids = JsonPath.read(perform.andReturn().getResponse().getContentAsString(), "$.[*].id");
 		int index = 0;
-		for (Integer id : ids) {
-			if (id.equals(board.getId().intValue())) return index;
+		for (String id : ids) {
+			if (id.equals(board.getId())) return index;
 			index++;
 		}
 		return -1;
 	}
 	
 	@SuppressWarnings("unchecked")
-	private String json(Object o) throws IOException {
+	private String toJson(Object o) throws IOException {
         MockHttpOutputMessage mockHttpOutputMessage = new MockHttpOutputMessage();
         this.mappingJackson2HttpMessageConverter.write(o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
         return mockHttpOutputMessage.getBodyAsString();

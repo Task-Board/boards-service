@@ -1,10 +1,7 @@
 package com.taskboards.boards.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.data.annotation.Id;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,13 +9,11 @@ import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
-@Entity
 public class Board {
 
 	@Id
-	@GeneratedValue
 	@Setter
-	private Long id;
+	private String id;
 
 	@Setter
 	@NotBlank

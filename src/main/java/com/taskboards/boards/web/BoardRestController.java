@@ -51,7 +51,7 @@ public class BoardRestController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<BoardResource> get(@PathVariable Long id) {
+	public ResponseEntity<BoardResource> get(@PathVariable String id) {
 		Board board = repository.findOne(id);
 		if (board != null) {
 			return new ResponseEntity<>(assembler.toResource(board), HttpStatus.OK);
@@ -71,7 +71,7 @@ public class BoardRestController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<BoardResource> update(@PathVariable Long id, @Valid @RequestBody Board board) {
+	public ResponseEntity<BoardResource> update(@PathVariable String id, @Valid @RequestBody Board board) {
 		Board persistedBoard = repository.findOne(id); 
 		if (board != null && persistedBoard != null) {
 			board.setId(id);
@@ -83,7 +83,7 @@ public class BoardRestController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<BoardResource> delete(@PathVariable Long id) {
+	public ResponseEntity<BoardResource> delete(@PathVariable String id) {
 		Board board = repository.findOne(id);
 		if (board != null) {
 			repository.delete(board);

@@ -2,9 +2,9 @@ package com.taskboards.boards.domain;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface BoardRepository extends JpaRepository<Board, Long> {
+public interface BoardRepository extends MongoRepository<Board, String> {
 	
 	List<Board> findByNameStartsWithIgnoreCase(String name);
 
